@@ -6,6 +6,7 @@ from Pymug.gameserver import PymugServer
 
 from commands.movement import *
 from commands.system import *
+from commands.talking import *
 
 if __name__ == '__main__':
     
@@ -20,12 +21,14 @@ if __name__ == '__main__':
     server.set_server_port(29999)                   #  change server port used for hosting
     server.set_db_host('localhost')                 #  change hostname used to connect to database
     server.set_db_port(28015)                       #  change port used to connect to database
-    server.set_game_thread_count(5)                 #  number of game threads to spawn to process player inputs
+    server.set_game_thread_count(2)                 #  number of game threads to spawn to process player inputs
     server.set_connection_buffer(5)                 #  number of socket connections to queue up before refusing connections
     
     #
     #  add custom game logic
     server.register_player_command('go', go)
+    server.register_player_command('say', say)
+    server.register_player_command('whisper', whisper)
     
     #
     #  override system signals
