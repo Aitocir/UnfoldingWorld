@@ -38,5 +38,5 @@ if __name__ == '__main__':
     
     #
     server.init_db(['player_state', 'paths'])
-    server.add_to_db('game', 'paths', {'entity': 'Origin Tree', 'neighbors': []})
+    server.add_to_db('game', 'paths', {'entity': 'Origin Tree', 'neighbors': [], 'distance':0})
     server.run()
