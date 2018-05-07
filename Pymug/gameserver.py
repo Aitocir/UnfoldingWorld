@@ -16,6 +16,7 @@ from .server.storage.game import GameDAO
 
 from .server.game.input import process_typed_input
 from .server.game.system_commands import system_cmds
+from .server.game.ecs_system import *
 
 from .common import messages as messenger
 
@@ -32,6 +33,8 @@ class PymugServer:
         self._usercmds = {}
         self._syscmds = system_cmds()
         self._c = None
+        self._clock_systems = {}
+        self._timer_systems = {}
     
     #
     #  server property setters
@@ -76,10 +79,45 @@ class PymugServer:
             raise ValueError('cmd must be a string, and gamefunc must be a function')
     
     #
+    #  allows callers to define ECS System that processes matching Components in real time
+    #  component predicate is a list of 3-tuple conditions to filter Components by
+    #  must take the form (row_name, comparison_op, value)
+    def define_ecs_clock_system(self, system_name, component_name, system_func, component_predicates=[], update_seconds=60.0, tick_seconds=None):
+        if not isinstance(system_name, str):
+            raise ValueError('define_ecs_system: system_name must be a string')
+        if not isinstance(component_name, str):
+            raise ValueError('define_ecs_system: component_name must be a string')
+        if not isinstance(component_predicates, list):
+            raise ValueError('define_ecs_system: component_name must be a list of 3-tuple predicates')
+        if not callable(system_func):
+            raise ValueError('define_ecs_system: system_func must be a function')
+        if not isinstance(update_seconds, int) and not isinstance(update_seconds, float):
+            raise ValueError('define_ecs_system: update_seconds must be an int or float')
+        if not isinstance(tick_seconds, int) and not isinstance(tick_seconds, float):
+            raise ValueError('define_ecs_system: tick_seconds must be an int or float')
+        if tick_seconds == None:
+            tick_seconds = update_seconds / 10
+        self._clock_systems[system_name] = (system_func, component_name, component_predicates, update_seconds, tick_seconds)
+    
+    #
+    #  allows callers to define ECS System that executes on a regular interval
+    def define_ecs_timer_system(self, system_name, system_func, update_seconds=60.0):
+        if not isinstance(system_name, str):
+            raise ValueError('define_ecs_system: system_name must be a string')
+        if not callable(system_func):
+            raise ValueError('define_ecs_system: system_func must be a function')
+        if not isinstance(update_seconds, int) and not isinstance(update_seconds, float):
+            raise ValueError('define_ecs_system: update_seconds must be an int or float')
+        self._timer_systems[system_name] = (system_func, update_seconds)
+    
+    #  TODO: make another System type that runs event-driven based on changes to matching Components
+    #def define_ecs_event_system(self, system_name, component_name, system_func, <predicates and any other needed info for processing filter>)
+        
+    #
     #  magick time
     #
     
-    def init_db(self, components=[]):
+    def init_db_with_ecs_components(self, components=[]):
         self._c = r.connect(self._db_host, self._db_port)
         
         dbs = r.db_list().run(self._c)
@@ -94,6 +132,7 @@ class PymugServer:
             r.db('game').table_create(x, primary_key='entity').run(self._c)
     
     def add_to_db(self, db, table, obj):
+        #  This function will not overwrite existing data
         r.db(db).table(table).insert(obj, conflict=lambda id, old_doc, newdoc: old_doc).run(self._c)
     
     def run(self, debug=False):
@@ -113,8 +152,14 @@ class PymugServer:
         courier_out = CourierOutbound(q_courier_out, messenger)
         courier_in.run()
         courier_out.run()
+        #  input processing threads (caller set, >= 1)
         for _ in range(self._gamethreads):
             start_new_thread(process_typed_input, (q_gamethread, q_courier_out, self._usercmds, self._syscmds, GameDAO(), messenger))
+        #  ECS system processing threads (1 per system)
+        for system in self._clock_systems:
+            start_new_thread(ecs_clock_system_thread, (GameDAO(), q_courier_out, messenger, system, *self._clock_systems[system]))
+        for system in self._timer_systems:
+            start_new_thread(ecs_timer_system_thread, (GameDAO(), q_courier_out, messenger, system, *self._timer_systems[system]))
         
         #
         #  connection loop

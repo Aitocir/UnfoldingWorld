@@ -11,7 +11,7 @@ class GameDAO:
             try:
                 result = r.table(component_name).get(entity_name).run(self._conn)
             except:
-                return None
+                raise
             return result
         else:
             raise ValueError('component_name and entity_name must be strings')
@@ -27,7 +27,7 @@ class GameDAO:
                     conflict = 'replace'
                     ).run(self._conn)
             except:
-                return False
+                raise
             return True
         else:
             raise ValueError('component_name and entity_name must be strings, component_value must be a dict')
@@ -42,7 +42,7 @@ class GameDAO:
                     component_value
                     ).run(self._conn)
             except:
-                return False
+                raise
             return True
         else:
             raise ValueError('component_name and entity_name must be strings, component_value must be a dict')
@@ -54,7 +54,7 @@ class GameDAO:
             try:
                 result = r.table(component_name).get(entity_name).delete().run(self._conn)
             except:
-                return False
+                raise
             return True
         else:
             raise ValueError('component_name and entity_name must be strings')
@@ -68,7 +68,7 @@ class GameDAO:
                 results = r.table(component_name).filter(component_value).run(self._conn)
                 entities = [x['entity'] for x in results]
             except:
-                return []
+                raise
             return entities
         else:
             raise ValueError('component_name must be a string, and component_value must be a dict')
@@ -80,10 +80,42 @@ class GameDAO:
             try:
                 results = r.table(component_name).filter(component_value).run(self._conn)
             except:
-                return []
+                raise
             return results
         else:
             raise ValueError('component_name must be a string, and component_value must be a dict')
+    #
+    #  get all Components matching provided predicates
+    #  -> [document]
+    def get_components_matching_predicates(self, component_name, predicates):
+        if isinstance(component_name, str) and isinstance(predicates, list):
+            try:
+                tmp = r.table(component_name)
+                for pred in predicates:
+                    include_missing = False
+                    if len(pred) > 3:
+                        if pred[3] == True:
+                            include_missing = True
+                        else:
+                            raise ValueError('Only valid value for fourth predicate elemet is True to indicate inclusion of objects with missing field')
+                    if pred[1] == '<':
+                        tmp = tmp.filter(r.row[pred[0]] < pred[2], default=include_missing)
+                    elif pred[1] == '<=':
+                        tmp = tmp.filter(r.row[pred[0]] <= pred[2], default=include_missing)
+                    elif pred[1] == '>':
+                        tmp = tmp.filter(r.row[pred[0]] > pred[2], default=include_missing)
+                    elif pred[1] == '>=':
+                        tmp = tmp.filter(r.row[pred[0]] >= pred[2], default=include_missing)
+                    elif pred[1] == '==':
+                        tmp = tmp.filter(r.row[pred[0]] == pred[2], default=include_missing)
+                    elif pred[1] == '!=':
+                        tmp = tmp.filter(r.row[pred[0]] != pred[2], default=include_missing)
+                results = tmp.run(self._conn)
+            except:
+                raise
+            return results
+        else:
+            raise ValueError('component_name must be a string, and predicates must be a list of 3-tuples')
     #
     #  get all Entities for Component
     #  -> [document]

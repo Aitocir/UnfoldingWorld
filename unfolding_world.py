@@ -7,6 +7,10 @@ from Pymug.gameserver import PymugServer
 from commands.movement import *
 from commands.system import *
 from commands.talking import *
+from commands.interaction import *
+
+from systems.mapping import *
+from systems.growing import *
 
 if __name__ == '__main__':
     
@@ -21,13 +25,14 @@ if __name__ == '__main__':
     server.set_server_port(29999)                   #  change server port used for hosting
     server.set_db_host('localhost')                 #  change hostname used to connect to database
     server.set_db_port(28015)                       #  change port used to connect to database
-    server.set_game_thread_count(2)                 #  number of game threads to spawn to process player inputs
+    server.set_game_thread_count(5)                 #  number of game threads to spawn to process player inputs
     server.set_connection_buffer(5)                 #  number of socket connections to queue up before refusing connections
     
     #
     #  add custom game logic
     server.register_player_command('go', go)
     server.register_player_command('say', say)
+    server.register_player_command('search', search)
     server.register_player_command('whisper', whisper)
     
     #
@@ -37,6 +42,12 @@ if __name__ == '__main__':
     server.override_system_command('logged-out', logout_player)
     
     #
-    server.init_db(['player_state', 'paths'])
-    server.add_to_db('game', 'paths', {'entity': 'Origin Tree', 'neighbors': [], 'distance':0})
+    #  define ECS systems
+    server.define_ecs_timer_system('map_reveal', generate_world_location, 10)
+    server.define_ecs_clock_system('plant_growing', 'tile', grow_plants, 
+        [('growth', '<', 100), ('plant', '!=', 'none')], 60, 10)
+    
+    #
+    server.init_db_with_ecs_components(['player_state', 'tile'])
+    server.add_to_db('game', 'tile', {'entity': '0;0'})
     server.run()
