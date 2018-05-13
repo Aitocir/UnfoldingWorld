@@ -58,7 +58,21 @@ class GameDAO:
             return True
         else:
             raise ValueError('component_name and entity_name must be strings')
-    
+    #
+    #  increment property of a Component
+    #
+    def increment_property_of_component(self, component_name, entity_name, property_name, increment_value):
+        if isinstance(component_name, str) and isinstance(property_name, str):
+            try:
+                component_value['entity'] = entity_name
+                result = r.table(component_name).get(entity_name).update({
+                    property_name: r.row[property_name]+increment_value
+                    }).run(self._conn)
+            except:
+                raise
+            return True
+        else:
+            raise ValueError('component_name and entity_name must be strings, component_value must be a dict')
     #
     #  get all Entities matching provided value
     #  -> [document]

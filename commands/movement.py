@@ -1,3 +1,6 @@
+#from .. import generators  #  generators.terrain import *
+
+from generators.terrain import *
 
 def go(username, db, messenger, terms):
     #
@@ -24,10 +27,12 @@ def go(username, db, messenger, terms):
     #
     #  execute
     if not dest_tile:
-        resp = 'Treacherous mist obscures your way (This tile has not been generated yet)'
-    else:
-        db.update_component_for_entity('player_state', {'location': dest}, username)
-        resp = 'You walk {0}'.format(terms[1])
+        dest_tile, dest_plants = generate_tile(px, py)
+        db.set_component_for_entity('tile', dest_tile, dest)
+        for p in dest_plants:
+            db.set_component_for_entity('plant', p, p['entity'])
+    db.update_component_for_entity('player_state', {'location': dest}, username)
+    resp = 'You walk {0}'.format(terms[1])
     m = messenger.plain_text(resp, username)
     return [m]
     

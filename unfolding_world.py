@@ -43,11 +43,11 @@ if __name__ == '__main__':
     
     #
     #  define ECS systems
-    server.define_ecs_timer_system('map_reveal', generate_world_location, 10)
-    server.define_ecs_clock_system('plant_growing', 'tile', grow_plants, 
-        [('growth', '<', 100), ('plant', '!=', 'none')], 60, 10)
+    #server.define_ecs_timer_system('map_reveal', generate_world_location, 10)
+    server.define_ecs_clock_system('plant_growing', 'plant', grow_plants, 
+        [('growth', '<', 100)], 60, 10)
     
     #
-    server.init_db_with_ecs_components(['player_state', 'tile'])
-    server.add_to_db('game', 'tile', {'entity': '0;0'})
+    server.init_db_with_ecs_components(['player_state', 'tile', 'plant'])
+    server.add_to_db('game', 'tile', {'entity': '0;0', 'plants': []})
     server.run()

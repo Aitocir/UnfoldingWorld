@@ -11,7 +11,10 @@ from client.transport.socket_in import recv_socket
 from client.transport.socket_out import send_socket
 from client.transport import courier
 
+from client import gameview
+
 import common.messages as messenger
+
 
 #  TODO: make this enterable (have a non-connected mode for client with connect, quit, settings commands)
 host = 'localhost'
@@ -26,17 +29,10 @@ qsend = queue.Queue()
 start_new_thread(recv_socket, (s, qrecv,))
 start_new_thread(send_socket, (s, qsend,))
 
-#  TODO: real UI with different input and output text boxes
-start_new_thread(courier.print_responses, (qrecv,messenger,))
+qprint = queue.Queue()
+qscan = queue.Queue()
 
-while True:
-    
-    line = input().strip()
-    if line == 'exit':
-        break
-    
-    message = messenger._pack(messenger.plain_text(line))
-    qsend.put(message)
-    
-    
-s.close()
+start_new_thread(courier.process_requests, (qscan, qsend, messenger,))
+start_new_thread(courier.process_responses, (qrecv, qprint, messenger,))
+
+gameview.start(qscan, qprint, 'Pymug Client')
