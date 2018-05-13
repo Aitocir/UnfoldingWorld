@@ -31,6 +31,7 @@ if __name__ == '__main__':
     #
     #  add custom game logic
     server.register_player_command('go', go)
+    server.register_player_command('pick', pick)
     server.register_player_command('say', say)
     server.register_player_command('search', search)
     server.register_player_command('whisper', whisper)
@@ -46,8 +47,10 @@ if __name__ == '__main__':
     #server.define_ecs_timer_system('map_reveal', generate_world_location, 10)
     server.define_ecs_clock_system('plant_growing', 'plant', grow_plants, 
         [('growth', '<', 100)], 60, 10)
+    server.define_ecs_clock_system('fruit_ripening', 'plant', ripen_fruit, 
+        [('fruit_growth', '<', 100)], 60, 10)
     
     #
-    server.init_db_with_ecs_components(['player_state', 'tile', 'plant'])
+    server.init_db_with_ecs_components(['player_state', 'tile', 'plant', 'inventory'])
     server.add_to_db('game', 'tile', {'entity': '0;0', 'plants': []})
     server.run()

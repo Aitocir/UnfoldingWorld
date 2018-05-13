@@ -40,9 +40,11 @@ def generate_tile(x, y, seed=0):
             'entity': tile_entity+';apple tree',
             'growth_rate': 10,
             'growth': 100,
-            'max_quantity': 10,
             'plant': 'apple tree', 
-            'resource': 'apples'
+            'fruit': 'apples',
+            'fruit_growth': 100,
+            'fruit_growth_rate': 4,
+            'fruit_count': 8
         })
     if 0.5 < temperature < 1.0 and 0.0 < moisture < 0.5:
         plants.append({
@@ -51,7 +53,10 @@ def generate_tile(x, y, seed=0):
             'growth': 100,
             'max_quantity': 25,
             'plant': 'fire berry bush', 
-            'resource': 'fire berries'
+            'fruit': 'fire berries',
+            'fruit_growth': 100,
+            'fruit_growth_rate': 5,
+            'fruit_count': 46
         })
     tile['plants'] = [x['plant'] for x in plants]
     return tile, plants
