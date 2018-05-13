@@ -31,6 +31,7 @@ if __name__ == '__main__':
     #
     #  add custom game logic
     server.register_player_command('check', check)
+    server.register_player_command('eat', eat)
     server.register_player_command('go', go)
     server.register_player_command('pick', pick)
     server.register_player_command('say', say)
@@ -52,6 +53,8 @@ if __name__ == '__main__':
         [('fruit_growth', '<', 100)], 60, 10)
     
     #
-    server.init_db_with_ecs_components(['player_state', 'tile', 'plant', 'inventory'])
+    server.init_db_with_ecs_components(['player_state', 'tile', 'plant', 'inventory', 'nutrition'])
     server.add_to_db('game', 'tile', {'entity': '0;0', 'plants': []})
+    server.add_to_db('game', 'nutrition', {'entity': 'apples'})         #  TODO: add actual nutrition info
+    server.add_to_db('game', 'nutrition', {'entity': 'fire berries'})   #  TODO: add actual nutrition info
     server.run()

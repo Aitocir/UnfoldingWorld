@@ -72,3 +72,17 @@ def check(username, db, messenger, terms):
         return [messenger.plain_text('Your inventory contains '+inv_desc, username)]
     else:
         return [messenger.plain_text("You can only check your inventory for now", username)]
+
+def eat(username, db, messenger, terms):
+    if len(terms) < 2:
+        return [messenger.plain_text('Eat what?', username)]
+    item = ' '.join(terms[1:])
+    player_inv = db.get_component_for_entity('inventory', username)
+    if item not in player_inv or player_inv[item] < 1:
+        return [messenger.plain_text("You don't have any {0} to eat".format(item), username)]
+    nutrition_label = db.get_component_for_entity('nutrition', item)
+    if not nutrition_label:
+        return [messenger.plain_text("{0} isn't edible, even if you really believe".format(item), username)]
+    #  TODO: use info in nutrition label to modify player stats
+    db.increment_property_of_component('inventory', username, item, -1)
+    return [messenger.plain_text("You eat 1 {0}".format(item), username)]
