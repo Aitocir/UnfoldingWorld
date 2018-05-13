@@ -55,4 +55,20 @@ def pick(username, db, messenger, terms):
     db.increment_property_of_component('plant', plant_entity, item+'_growth', (-100 / plant[item+'_count']) * amount)
     db.increment_property_of_component('inventory', username, plant[item], amount)
     return [messenger.plain_text("You pick {0} {1} off the nearby {2}".format(amount, plant[item], plant_name), username)]
-    
+
+def check(username, db, messenger, terms):
+    if len(terms) < 2:
+        return [messenger.plain_text("Mate!", username)]
+    elif terms[1] == 'inventory':
+        player_inv = db.get_component_for_entity('inventory', username)
+        items = sorted(list(player_inv.keys()))
+        lines = []
+        for item in items:
+            if item != 'entity' and player_inv[item] > 0:
+                lines.append('{0} {1}'.format(player_inv[item], item))
+        inv_desc = ', '.join(lines)
+        if len(inv_desc) == 0:
+            inv_desc = 'nothing'
+        return [messenger.plain_text('Your inventory contains '+inv_desc, username)]
+    else:
+        return [messenger.plain_text("You can only check your inventory for now", username)]

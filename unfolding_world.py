@@ -30,6 +30,7 @@ if __name__ == '__main__':
     
     #
     #  add custom game logic
+    server.register_player_command('check', check)
     server.register_player_command('go', go)
     server.register_player_command('pick', pick)
     server.register_player_command('say', say)
