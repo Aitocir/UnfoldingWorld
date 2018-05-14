@@ -1,18 +1,19 @@
 #  system functions for the effects of time on a player
 
 def raise_hunger(db, messenger, object):
+    print('HUNGER for {0}'.format(object['entity']))
     if object['hunger'] >= 9:
         #  player is going to die, so let's just skip the database
         #  TODO: don't do this, and let an event driven system pick up players who have gotten too hungry
         username = object['entity']
-        db.set_component_for_entity('player_status', {'location': '0;0'}, username)
+        db.set_component_for_entity('player_state', {'location': '0;0', 'hunger': 0}, username)
         db.set_component_for_entity('inventory', {}, username)
         return [
             messenger.plain_text('You have died of hunger!', username),
             messenger.plain_text('You have lost everything in your inventory!', username),
             messenger.plain_text('You have been resurrected at The Origin!', username)
         ]
-    db.increment_property_of_component('player_status', object['entity'], 'hunger', 1)
+    db.increment_property_of_component('player_state', object['entity'], 'hunger', 1)
     if 2 <= object['hunger'] < 3:
         return [messenger.plain_text('You begin to feel hungry', object['entity'])]
     if 4 <= object['hunger'] < 5:

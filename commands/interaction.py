@@ -84,5 +84,6 @@ def eat(username, db, messenger, terms):
     if not nutrition_label:
         return [messenger.plain_text("{0} isn't edible, even if you really believe".format(item), username)]
     #  TODO: use info in nutrition label to modify player stats
+    db.increment_property_of_component('player_state', username, 'hunger', -nutrition_label['energy'])
     db.increment_property_of_component('inventory', username, item, -1)
     return [messenger.plain_text("You eat 1 {0}".format(item), username)]

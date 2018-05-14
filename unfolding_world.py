@@ -60,6 +60,6 @@ if __name__ == '__main__':
     #
     server.init_db_with_ecs_components(['player_state', 'tile', 'plant', 'inventory', 'nutrition'])
     server.add_to_db('game', 'tile', {'entity': '0;0', 'plants': [], 'elevation': 0.5, 'moisture': 0.5, 'temperature': 0.5, 'biome': 'THE ORIGIN'})
-    server.add_to_db('game', 'nutrition', {'entity': 'apples'})         #  TODO: add actual nutrition info
-    server.add_to_db('game', 'nutrition', {'entity': 'fire berries'})   #  TODO: add actual nutrition info
+    server.add_to_db('game', 'nutrition', {'entity': 'apples', 'energy': 1.5})         #  TODO: add actual nutrition info
+    server.add_to_db('game', 'nutrition', {'entity': 'fire berries', 'energy': 0.1})   #  TODO: add actual nutrition info
     server.run()
