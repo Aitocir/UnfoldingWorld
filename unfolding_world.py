@@ -11,6 +11,7 @@ from commands.interaction import *
 
 from systems.mapping import *
 from systems.growing import *
+from systems.aging import *
 
 if __name__ == '__main__':
     
@@ -53,6 +54,8 @@ if __name__ == '__main__':
         [('growth', '<', 100)], 60, 10)
     server.define_ecs_clock_system('fruit_ripening', 'plant', ripen_fruit, 
         [('fruit_growth', '<', 100)], 60, 10)
+    server.define_ecs_clock_system('hunger_rising', 'player_state', raise_hunger,
+        [('status', '!=', 'offline')], 300, 10)
     
     #
     server.init_db_with_ecs_components(['player_state', 'tile', 'plant', 'inventory', 'nutrition'])

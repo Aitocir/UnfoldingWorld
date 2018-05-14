@@ -1,7 +1,7 @@
 import time
 
 def init_player(username, db, messenger):
-    db.set_component_for_entity('player_state', {'last_login':0, 'location':'0;0', 'status':'offline'}, username)
+    db.set_component_for_entity('player_state', {'last_login':0, 'location':'0;0', 'status':'offline', 'hunger': 0}, username)
     db.set_component_for_entity('inventory', {}, username)
     return []
 
