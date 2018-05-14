@@ -20,29 +20,27 @@ def _search_for_plants(username, db, messenger):
         desc = "You don't see any plants of value in the area."
     return [messenger.plain_text(desc, username)]
 
-def search(username, db, messenger, terms):
-    if len(terms) < 2:
+def search(username, db, messenger, command):
+    if 'for' not in command:
         return [messenger.plain_text('For meaning? Happiness? What?!', username)]
-    elif terms[1] == 'plants':
+    elif command['for'] == 'plants':
         return _search_for_plants(username, db, messenger)
-    return [messenger.plain_text('Searching for "{0}" won\'t work here! (try "plants" instead)'.format(terms[1]), username)]
+    return [messenger.plain_text('Searching for "{0}" won\'t work here! (try "plants" instead)'.format(command['for']), username)]
 
-def pick(username, db, messenger, terms):
-    if len(terms) < 2:
+def pick(username, db, messenger, command):
+    if 'directobject' not in command:
         return [messenger.plain_text("Pick what? If you're gonna be greedy, at least be specific...", username)]
-    elif len(terms) < 4:
+    elif 'from' not in command:
         return [messenger.plain_text("Pick from what? If you're gonna be greedy, at least be specific...", username)]
     amount = 1
-    offset = 0
-    if terms[1].isdigit():
-        amount = int(terms[1])
-        offset = 1
+    if 'directobject_num' in command:
+        amount = command['directobject_num']
     if amount < 1:
         return [messenger.plain_text("Picking less than one of something doesn't really make sense, now does it?", username)]
-    elif terms[2+offset] != 'from' or terms[1+offset] not in set(['fruit']):
+    elif command['directobject'] not in set(['fruit']):
         return [messenger.plain_text('You can only "pick fruit from" plants for now, sorry :(', username)]
-    item = terms[1+offset]
-    plant_name = ' '.join(terms[3+offset:])
+    item = command['directobject']
+    plant_name = command['from']
     player_state = db.get_component_for_entity('player_state', username)
     plant_entity = player_state['location']+';'+plant_name
     plant = db.get_component_for_entity('plant', plant_entity)
@@ -56,10 +54,10 @@ def pick(username, db, messenger, terms):
     db.increment_property_of_component('inventory', username, plant[item], amount)
     return [messenger.plain_text("You pick {0} {1} off the nearby {2}".format(amount, plant[item], plant_name), username)]
 
-def check(username, db, messenger, terms):
-    if len(terms) < 2:
+def check(username, db, messenger, command):
+    if 'directobject' not in command:
         return [messenger.plain_text("Mate!", username)]
-    elif terms[1] == 'inventory':
+    elif command['directobject'] == 'inventory':
         player_inv = db.get_component_for_entity('inventory', username)
         items = sorted(list(player_inv.keys()))
         lines = []
@@ -73,10 +71,10 @@ def check(username, db, messenger, terms):
     else:
         return [messenger.plain_text("You can only check your inventory for now", username)]
 
-def eat(username, db, messenger, terms):
-    if len(terms) < 2:
+def eat(username, db, messenger, command):
+    if 'directobject' not in command:
         return [messenger.plain_text('Eat what?', username)]
-    item = ' '.join(terms[1:])
+    item = command['directobject']
     player_inv = db.get_component_for_entity('inventory', username)
     if item not in player_inv or player_inv[item] < 1:
         return [messenger.plain_text("You don't have any {0} to eat".format(item), username)]

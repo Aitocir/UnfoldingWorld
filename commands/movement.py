@@ -9,25 +9,26 @@ def _make_tile(px, py, db, dest):
         db.set_component_for_entity('plant', p, p['entity'])
     return dest_tile
 
-def go(username, db, messenger, terms):
+def go(username, db, messenger, command):
     #
     #  validate input
-    if len(terms) < 2:
+    if 'directobject' not in command:
         return [messenger.plain_text('Go where?', username)]
-    if terms[1] not in set(['north', 'south', 'east', 'west']):
-        return [messenger.plain_text('Going {0} proves difficult... (Valid directions are north, south, east, and west)'.format(terms[1]), username)]
+    dir = command['directobject']
+    if dir not in set(['north', 'south', 'east', 'west']):
+        return [messenger.plain_text('Going {0} proves difficult... (Valid directions are north, south, east, and west)'.format(dir), username)]
     #
     #  gain bearing and determine destination
     player_state = db.get_component_for_entity('player_state', username)
     loc = player_state['location']
     px,py = [int(tmp) for tmp in loc.split(';')]
-    if terms[1] == 'north':
+    if dir == 'north':
         py += 1
-    if terms[1] == 'south':
+    if dir == 'south':
         py -= 1
-    if terms[1] == 'east':
+    if dir == 'east':
         px += 1
-    if terms[1] == 'west':
+    if dir == 'west':
         px -= 1
     dest = '{0};{1}'.format(px, py)
     dest_tile = db.get_component_for_entity('tile', dest)
@@ -36,29 +37,30 @@ def go(username, db, messenger, terms):
     if not dest_tile:
         _make_tile(px, py, db, dest)
     db.update_component_for_entity('player_state', {'location': dest}, username)
-    resp = 'You walk {0}'.format(terms[1])
+    resp = 'You walk {0}'.format(dir)
     m = messenger.plain_text(resp, username)
     return [m]
 
-def look(username, db, messenger, terms):
+def look(username, db, messenger, command):
     #
     #  validate input
-    if len(terms) < 2:
+    if 'directobject' not in command:
         return [messenger.plain_text('Look where?', username)]
-    if terms[1] not in set(['north', 'south', 'east', 'west', 'around']):
-        return [messenger.plain_text('Looking {0} proves difficult... (Valid options are north, south, east, west, and around)'.format(terms[1]), username)]
+    target = command['directobject']
+    if target not in set(['north', 'south', 'east', 'west', 'around']):
+        return [messenger.plain_text('Looking {0} proves difficult... (Valid options are north, south, east, west, and around)'.format(target), username)]
     #
     #  do the looking
     player_state = db.get_component_for_entity('player_state', username)
     loc = player_state['location']
     px,py = [int(tmp) for tmp in loc.split(';')]
-    if terms[1] == 'north':
+    if target == 'north':
         py += 1
-    if terms[1] == 'south':
+    if target == 'south':
         py -= 1
-    if terms[1] == 'east':
+    if target == 'east':
         px += 1
-    if terms[1] == 'west':
+    if target == 'west':
         px -= 1
     dest = '{0};{1}'.format(px, py)
     dest_tile = db.get_component_for_entity('tile', dest)
@@ -66,11 +68,11 @@ def look(username, db, messenger, terms):
     #  execute
     if not dest_tile:
         dest_tile = _make_tile(px, py, db, dest)
-    resp = 'You look {0}, and see {1}'.format(terms[1], dest_tile['biome'])
+    resp = 'You look {0}, and see {1}'.format(target, dest_tile['biome'])
     m = messenger.plain_text(resp, username)
     return [m]
 
-def orient(username, db, messenger, terms):
+def orient(username, db, messenger, command):
     #  no parameters for this command, so anything is valid
     player_state = db.get_component_for_entity('player_state', username)
     loc = player_state['location']

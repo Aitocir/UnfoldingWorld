@@ -63,13 +63,6 @@ def start(input_q, output_q, view_name='Game :D'):
     output_views = []
     for i in range(output_line_count):
         output_views.append(init_outputbox(10, 520-(24*i), 780, 24))
-    """
-    stat_views_box = pygame.Rect(500, 10, 290, 290)
-    stat_views = []
-    for i in range(len(stats_callback())):
-        stat_views.append(init_statbox(500, 10+(35*i), 290, 32))
-    """
-    #  TODO: other views
     #
     # Game loop
     #
@@ -121,14 +114,6 @@ def start(input_q, output_q, view_name='Game :D'):
                 output_views[i].color = (200,200,200) #  (100,100,100) if game_messages[-1-i-scroll_offset][0] == 'INFO' else (25,25,25)
                 otext = output_views[i].render()
                 screen.blit(otext, output_views[i].pos(5, 5))
-            """
-            stats = stats_callback()
-            pygame.draw.rect(screen, (0,0,0), stat_views_box, 2)
-            for i in range(len(stats)):
-                stat_views[i].text = '{0}: {1}'.format(*stats[i])
-                stext = stat_views[i].render()
-                screen.blit(stext, stat_views[i].pos(5, 5))
-            """
         pygame.display.flip()
         clock.tick(30)
         input_dirty = False
