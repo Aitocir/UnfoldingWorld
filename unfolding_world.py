@@ -33,6 +33,7 @@ if __name__ == '__main__':
     server.register_player_command('check', check)
     server.register_player_command('eat', eat)
     server.register_player_command('go', go)
+    server.register_player_command('look', look)
     server.register_player_command('pick', pick)
     server.register_player_command('say', say)
     server.register_player_command('search', search)
@@ -54,7 +55,7 @@ if __name__ == '__main__':
     
     #
     server.init_db_with_ecs_components(['player_state', 'tile', 'plant', 'inventory', 'nutrition'])
-    server.add_to_db('game', 'tile', {'entity': '0;0', 'plants': []})
+    server.add_to_db('game', 'tile', {'entity': '0;0', 'plants': [], 'elevation': 0.5, 'moisture': 0.5, 'temperature': 0.5, 'biome': 'THE ORIGIN'})
     server.add_to_db('game', 'nutrition', {'entity': 'apples'})         #  TODO: add actual nutrition info
     server.add_to_db('game', 'nutrition', {'entity': 'fire berries'})   #  TODO: add actual nutrition info
     server.run()

@@ -1,5 +1,37 @@
 import opensimplex as os
 
+def _biome(moisture, temperature):
+    if moisture >= 1.0:
+        return 'water'
+    if moisture >= 0.75:
+        if temperature <= 0.3:
+            return 'bog'
+        elif temperature <= 0.7:
+            return 'marsh'
+        else:
+            return 'swamp'
+    elif moisture >= 0.5:
+        if temperature <= 0.3:
+            return 'taiga'
+        elif temperature <= 0.7:
+            return 'temperate forest'
+        else:
+            return 'rain forest'
+    elif moisture >= 0.25:
+        if temperature <= 0.3:
+            return 'tundra'
+        elif temperature <= 0.7:
+            return 'steppe'
+        else:
+            return 'savanna'
+    else:
+        if temperature <= 0.3:
+            return 'polar desert'
+        elif temperature <= 0.7:
+            return 'temperate desert'
+        else:
+            return 'arid desert'
+
 def _norm(x):
     n = (1.0 + (x*(1/0.866))) / 2
     return min(1.0,(max(0.0,n)))
@@ -33,6 +65,10 @@ def generate_tile(x, y, seed=0):
     t_lower = _scale(temperature, t_lower_min, t_lower_max)
     t_upper = _scale(temperature, t_upper_min, t_upper_max)
     temperature = _scale(temperature, t_lower, t_upper)
+    tile['elevation'] = elevation
+    tile['moisture'] = moisture
+    tile['temperature'] = temperature
+    tile['biome'] = _biome(moisture, temperature)
     #  TODO: dynamically load plant definitions from elsewhere and loop through them or something
     plants = []
     if 0.2 < temperature < 0.6 and 0.2 < moisture < 0.8:
