@@ -8,11 +8,11 @@ def ecs_clock_system_thread(db, q, messenger, system_name, system_func, componen
     while True:
         start_time = time.time()
         matches = db.get_components_matching_predicates(component_name, component_predicates+[(system_prop, '<=', start_time-update_seconds, True)])
-        for m in matches:
-            messages = system_func(db, messenger, m)
-            for m in messages:
-                q.put(m)
-            db.update_component_for_entity(component_name, {system_prop: time.time()}, m['entity'])
+        for match in matches:
+            messages = system_func(db, messenger, match)
+            for message in messages:
+                q.put(message)
+            db.update_component_for_entity(component_name, {system_prop: time.time()}, match['entity'])
         elapsed = time.time()-start_time
         if elapsed < tick_seconds:
             time.sleep(tick_seconds-elapsed)

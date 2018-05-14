@@ -8,6 +8,7 @@ from commands.movement import *
 from commands.system import *
 from commands.talking import *
 from commands.interaction import *
+from commands.meta import *
 
 from systems.mapping import *
 from systems.growing import *
@@ -34,6 +35,7 @@ if __name__ == '__main__':
     server.register_player_command('check', check)
     server.register_player_command('eat', eat)
     server.register_player_command('go', go)
+    server.register_player_command('help', help)
     server.register_player_command('look', look)
     server.register_player_command('orient', orient)
     server.register_player_command('pick', pick)

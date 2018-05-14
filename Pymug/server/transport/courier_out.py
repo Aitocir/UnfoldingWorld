@@ -23,7 +23,7 @@ class CourierOutbound:
                 self._clients[task[1]] = task[2]
                 print('mapped {0} to {1}'.format(task[1], task[2]))
             elif task[0] == -1:  #  inbound socket closed
-                #  self._sq.pop()
+                self._sq.pop(task[1], None)
                 self._clients.pop(task[1], None)
     def run(self):
         start_new_thread(self._loop, tuple())

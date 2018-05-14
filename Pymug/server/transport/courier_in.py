@@ -72,7 +72,9 @@ class CourierInbound:
                 cid = task[1]
                 self._users[cid] = None
             elif task[0] == -1: #  closed socket
-                self._qgame.put(self._build_system_signal(self._users.pop(task[1]), 'logged-out'))
+                disconnecting_user = self._users.pop(task[1])
+                if disconnecting_user:
+                    self._qgame.put(self._build_system_signal(disconnecting_user, 'logged-out'))
                 self._qout.put(task)
                 print('socket closed: {0}'.format(task[1]))
     def run(self):

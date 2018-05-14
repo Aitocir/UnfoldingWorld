@@ -1,7 +1,7 @@
 import pygame
 
 class TextView():
-    def __init__(self, text, font, rect, color=(0,0,0)):
+    def __init__(self, text, font, rect, color=(220,220,220)):
         self.text = text
         self.font = font
         self.rect = rect
@@ -51,6 +51,7 @@ def get_input(current_text):
     return signals, current_text
 
 def start(input_q, output_q, view_name='Game :D'):
+    output_line_count = 16
     pygame.init()
     #  init values
     scroll_offset = 0
@@ -58,9 +59,9 @@ def start(input_q, output_q, view_name='Game :D'):
     clock = pygame.time.Clock()
     #  init views
     input_view = init_inputbox(10, 560, 780, 30)
-    output_views_box = pygame.Rect(10, 304, 780, 250)
+    output_views_box = pygame.Rect(10, 154, 780, 400)
     output_views = []
-    for i in range(10):
+    for i in range(output_line_count):
         output_views.append(init_outputbox(10, 520-(24*i), 780, 24))
     """
     stat_views_box = pygame.Rect(500, 10, 290, 290)
@@ -75,7 +76,7 @@ def start(input_q, output_q, view_name='Game :D'):
     #  init window
     screen = pygame.display.set_mode((800, 600))
     pygame.display.set_caption(view_name)
-    screen.fill((220,220,220))
+    screen.fill((22,22,22))
     running = True
     input_dirty = True
     output_dirty = True
@@ -86,7 +87,7 @@ def start(input_q, output_q, view_name='Game :D'):
         old_text = input_view.text
         signals, input_view.text = get_input(input_view.text)
         input_dirty = old_text != input_view.text
-        scroll_offset = max(0, min(100-10, scroll_offset + signals['Scroll']))
+        scroll_offset = max(0, min(100-output_line_count, scroll_offset + signals['Scroll']))
         output_dirty = output_dirty or signals['Scroll'] != 0
         #
         #  update output with new items
@@ -110,14 +111,14 @@ def start(input_q, output_q, view_name='Game :D'):
         # Draw
         #
         if input_dirty or output_dirty:
-            screen.fill((220,220,220))
+            screen.fill((52,52,52))
             itext = input_view.render()
-            pygame.draw.rect(screen, (0,0,0), input_view.rect, 2)
+            pygame.draw.rect(screen, (240,240,240), input_view.rect, 2)
             screen.blit(itext, input_view.pos(5, 5))
-            pygame.draw.rect(screen, (0,0,0), output_views_box, 2)
-            for i in range(10):
+            pygame.draw.rect(screen, (240,240,240), output_views_box, 2)
+            for i in range(output_line_count):
                 output_views[i].text = game_messages[-1-i-scroll_offset]
-                output_views[i].color = (25,25,25) #  (100,100,100) if game_messages[-1-i-scroll_offset][0] == 'INFO' else (25,25,25)
+                output_views[i].color = (200,200,200) #  (100,100,100) if game_messages[-1-i-scroll_offset][0] == 'INFO' else (25,25,25)
                 otext = output_views[i].render()
                 screen.blit(otext, output_views[i].pos(5, 5))
             """
