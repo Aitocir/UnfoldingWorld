@@ -40,7 +40,7 @@ def _scale(x, lower, upper):
     r = upper-lower
     return lower + (r * x)
 
-def generate_tile(x, y, seed=0):
+def generate_tile(x, y, zoom=8, seed=0):
     tile_entity = '{0};{1}'.format(x,y)
     tile = {'entity': tile_entity}
     #
@@ -56,12 +56,12 @@ def generate_tile(x, y, seed=0):
     #
     #  terrain type
     #  TODO: cache OpenSimplex() objects instead of re-creating for each tile call
-    elevation = _norm(os.OpenSimplex(seed+1).noise2d(x,y))
-    moisture = _norm(os.OpenSimplex(seed+2).noise2d(x,y))
+    elevation = _norm(os.OpenSimplex(seed+1).noise2d(x/zoom,y/zoom))
+    moisture = _norm(os.OpenSimplex(seed+2).noise2d(x/zoom,y/zoom))
     m_lower = _scale(moisture, m_lower_min, m_lower_max)
     m_upper = _scale(moisture, m_upper_min, m_upper_max)
     moisture = _scale(moisture, m_lower, m_upper)
-    temperature = _norm(os.OpenSimplex(seed+3).noise2d(x,y))
+    temperature = _norm(os.OpenSimplex(seed+3).noise2d(x/zoom,y/zoom))
     t_lower = _scale(temperature, t_lower_min, t_lower_max)
     t_upper = _scale(temperature, t_upper_min, t_upper_max)
     temperature = _scale(temperature, t_lower, t_upper)

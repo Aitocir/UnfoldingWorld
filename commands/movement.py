@@ -69,3 +69,20 @@ def look(username, db, messenger, terms):
     resp = 'You look {0}, and see {1}'.format(terms[1], dest_tile['biome'])
     m = messenger.plain_text(resp, username)
     return [m]
+
+def orient(username, db, messenger, terms):
+    #  no parameters for this command, so anything is valid
+    player_state = db.get_component_for_entity('player_state', username)
+    loc = player_state['location']
+    px,py = [int(tmp) for tmp in loc.split(';')]
+    ns = 'north' if py>0 else 'south'
+    ew = 'east' if px>0 else 'west'
+    ns_text = '' if py==0 else '{0} tile{2} {1}'.format(abs(py), ns, 's' if abs(py)>1 else '')
+    ew_text = '' if px==0 else '{0} tile{2} {1}'.format(abs(px), ew, 's' if abs(px)>1 else '')
+    joiner = ' and ' if len(ns_text) and len(ew_text) else ''
+    full_desc = ns_text + joiner + ew_text
+    if len(full_desc):
+        full_desc += ' of'
+    else:
+        full_desc = 'at'
+    return [messenger.plain_text("You are {0} The Origin".format(full_desc), username)]

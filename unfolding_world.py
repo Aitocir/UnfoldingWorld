@@ -34,6 +34,7 @@ if __name__ == '__main__':
     server.register_player_command('eat', eat)
     server.register_player_command('go', go)
     server.register_player_command('look', look)
+    server.register_player_command('orient', orient)
     server.register_player_command('pick', pick)
     server.register_player_command('say', say)
     server.register_player_command('search', search)
