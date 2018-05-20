@@ -17,7 +17,7 @@ import common.messages as messenger
 
 
 #  TODO: make this enterable (have a non-connected mode for client with connect, quit, settings commands)
-host = 'localhost'
+host = '10.0.0.240'
 port = 29999
 
 sock = socket.socket()

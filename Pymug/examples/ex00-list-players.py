@@ -12,14 +12,14 @@ def goodbye_player(username, db, messenger):
     db.set_component_for_entity('status', {'online': False}, username)
     return []
 
-def list_players(username, db, messenger, terms):
-    if len(terms) != 2:
+def list_players(username, db, messenger, command):
+    if 'directobject' not in command:
         return [messenger.plain_text('Usage: "list <online | all>"', username)] 
-    elif terms[1] == 'online':
+    elif command['directobject'] == 'online':
         online_users = db.get_matching_entities('status', {'online': True})
         userlist = '\n'.join(online_users)
         return [messenger.plain_text('The following users are online:\n\n{0}'.format(userlist), username)]
-    elif terms[1] == 'all':
+    elif command['directobject'] == 'all':
         online_users = db.get_all_entities('status')
         userlist = '\n'.join(online_users)
         return [messenger.plain_text('The following users are registered with this server:\n\n{0}'.format(userlist), username)]
